@@ -419,6 +419,14 @@ Button
     color:#607087;
 }
 
+.btn-info{
+    color: #fff;
+    background-color: #648cff;
+    border:1px solid;
+    border-color: #648cff;
+    padding: 1rem 2rem;
+}
+
 .btn-danger{
     color: #fff;
     background-color: #ff6b6b;
@@ -1305,4 +1313,25 @@ nav.navbar.bootsnav.footer-menu ul li a:hover{
 .scrollup:hover {
     background-color: blueviolet;
     color:#fff;
+}
+
+.center-flex {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.card {
+    margin: 18px;
+    padding: 18px;
+    border-radius: 8px;
+    width: calc(100% - 36px);
+    max-width: 400px;
+    background-color: white;
+    box-shadow: 1px 1px 4px #aaa;
+}
+
+.price {
+    color: #aaa;
+    text-decoration: line-through;
 }
