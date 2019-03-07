@@ -1,2 +1,29 @@
+# OSX
 .DS_Store
-**/.DS_Store
+
+# Thumbnails
+._*
+
+# Files that might appear in the root of a volume
+.DocumentRevisions-V100
+.fseventsd
+.Spotlight-V100
+.TemporaryItems
+.Trashes
+.VolumeIcon.icns
+
+# node.js
+node_modules/
+npm-debug.log
+
+# BUCK
+buck-out/
+\.buckd/
+android/app/libs
+android/keystores/debug.keystore
+
+#awsmobilejs
+appsync-info.json
+aws-info.json
+project-info.json
+src/aws-exports.*
