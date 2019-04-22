@@ -1,10 +1,8 @@
 import { Component } from 'react';
 import { h } from 'react-hyperscript-helpers';
-import { Auth } from 'aws-amplify';
+import { Auth, API } from 'aws-amplify';
 
-const stripe = Stripe('pk_test_6o0gMfCYo82x7ZH5cer14pyx', {
-  betas: ['checkout_beta_4']
-});
+const stripe = Stripe('pk_live_I57MvVCxtc2kYEwfUi0Ssc5L');
 
 export class Settings extends Component {
   constructor() {
@@ -13,16 +11,38 @@ export class Settings extends Component {
     this.state = {
       error: '',
       userId: '',
+      account: {},
+      loading: false,
     }
   }
   componentDidMount() {
+    this.setState({ loading: true });
     Auth.currentAuthenticatedUser()
-      .then((user) => this.setState({
-        userId: user.attributes.sub,
-        username: user.username,
-      }))
+      .then((user) => {
+
+        this.setState({
+          userId: user.attributes.sub,
+          username: user.username,
+        });
+
+        API.get('stream', `/user/${user.attributes.sub}`)
+          .then((response) => {
+            this.setState({
+              account: response.data.account,
+              loading: false,
+            });
+          }).catch(() => {
+            this.setState({
+              error: 'Could not fetch user. Refresh the page',
+              loading: false,
+            })
+          });
+      })
       .catch(() => {
-        this.setState({ error: 'Could not fetch user. Refresh the page'})
+        this.setState({
+          error: 'Could not fetch user. Refresh the page',
+          loading: false,
+        });
       });
   }
 
@@ -33,7 +53,7 @@ export class Settings extends Component {
 
       clientReferenceId: this.state.userId,
 
-      items: [{plan: 'plan_Eibo6UPnet5zyh', quantity: 1}],
+      items: [{plan: 'plan_EvVdMEhRO57R9s', quantity: 1}],
 
       // Note that it is not guaranteed your customers will be redirected to this
       // URL *100%* of the time, it's possible that they could e.g. close the
@@ -49,6 +69,7 @@ export class Settings extends Component {
   }
 
   render() {
+    console.log(this.state);
     return h('div', {
       className: 'main_home',
     }, [

@@ -4,7 +4,7 @@ import { h } from 'react-hyperscript-helpers';
 import Amplify, { Auth } from 'aws-amplify';
 import { AuthUI } from './auth';
 import { Settings } from './settings';
-import { awsConfig } from './aws-exports';
+import { awsConfig } from './aws-config';
 
 Amplify.configure(awsConfig);
 
@@ -20,9 +20,7 @@ export class Container extends Component {
   }
 
   componentDidMount() {
-    this.stripe = Stripe('pk_test_6o0gMfCYo82x7ZH5cer14pyx', {
-      betas: ['checkout_beta_4']
-    });
+    this.stripe = Stripe('pk_live_I57MvVCxtc2kYEwfUi0Ssc5L');
 
     Auth.currentAuthenticatedUser()
       .then((user) => this.setState({
@@ -41,7 +39,7 @@ export class Container extends Component {
       // TODO hook up the user's id
       clientReferenceId: JSON.stringify(this.state.user),
 
-      items: [{plan: 'plan_Eibo6UPnet5zyh', quantity: 1}],
+      items: [{plan: 'plan_EvVdMEhRO57R9s', quantity: 1}],
 
       // Note that it is not guaranteed your customers will be redirected to this
       // URL *100%* of the time, it's possible that they could e.g. close the
