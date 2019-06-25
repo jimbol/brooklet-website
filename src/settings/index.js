@@ -2,7 +2,6 @@ import { Component } from 'react';
 import { h } from 'react-hyperscript-helpers';
 import { Auth, API } from 'aws-amplify';
 
-const stripe = Stripe('pk_live_I57MvVCxtc2kYEwfUi0Ssc5L');
 
 export class Settings extends Component {
   constructor() {
@@ -15,6 +14,7 @@ export class Settings extends Component {
       loading: false,
     }
   }
+
   componentDidMount() {
     this.setState({ loading: true });
     Auth.currentAuthenticatedUser()
@@ -46,75 +46,155 @@ export class Settings extends Component {
       });
   }
 
-  pay() {
-    stripe.redirectToCheckout({
-
-      // TODO hook up the user's id
-
-      clientReferenceId: this.state.userId,
-
-      items: [{plan: 'plan_EvVdMEhRO57R9s', quantity: 1}],
-
-      // Note that it is not guaranteed your customers will be redirected to this
-      // URL *100%* of the time, it's possible that they could e.g. close the
-      // tab between form submission and the redirect.
-      successUrl: 'https://www.brooklet.app/success.html',
-      cancelUrl: 'https://www.brooklet.app/canceled.html',
-    })
-    .then(function (result) {
-      if (result.error) {
-        this.setState({ error: result.error.message })
-      }
+  download() {
+    this.setState({
+      loading: true,
     });
+    API.get('stream', '/get-data')
+      .then((response) => {
+        this.setState({
+          loading: false,
+        });
+        const transformedData = response.data.map((group) => {
+          const { stream, events, fields } = group;
+          const folder = removeIds(stream);
+          const eventHash = events.reduce((acc, event) => {
+            if (event.id) acc[event.id] = removeIds(event);
+            return acc;
+          }, {});
+
+          delete folder.fields;
+
+          folder.streams = fields.reduce((acc, stream) => {
+            stream.events = (stream.events || []).reduce((acc, id) => {
+              if (eventHash[id]) acc.push(eventHash[id]);
+              return acc;
+            }, []);
+            acc.push(removeIds(stream));
+            return acc;
+          }, []);
+
+          return folder;
+        });
+
+        console.log(transformedData);
+        this.saveText(JSON.stringify(transformedData), 'brooklet-data.json');
+      }).catch((e) => {
+        console.log(e);
+
+        this.setState({
+          error: 'Could not fetch data. Refresh the page and try again.',
+          loading: false,
+        })
+      });
+  }
+
+  saveText(text, filename) {
+    const a = document.createElement('a');
+
+    a.setAttribute('href', 'data:text/plain;charset=utf-u,' + encodeURIComponent(text));
+    a.setAttribute('download', filename);
+    a.click();
   }
 
   render() {
-    console.log(this.state);
     return h('div', {
-      className: 'main_home',
+      style: {
+				padding: 6,
+
+      }
     }, [
+      h('h1', {
+        style: {
+          color: 'white',
+        },
+      }, [h('strong', 'Get a JSON file of your data')]),
       h('div', {
-        'data-wow-duration': '1s',
-        className: 'col-md-4 wow fadeInLeft',
+        style: {
+					flexDirection: 'column',
+					display: 'flex',
+        }
       }, [
-        h('div', {
-          className: 'home_text',
-        }, [
-          h('h1', {
-            className: 'text-white',
-          }, 'Power Users'),
 
-          h('h3', {
+        h('div', {
+					className: 'col-md-12 col-sm-12 col-xs-12 wow fadeInRight head_title',
+					style: {
+						backgroundColor: 'white',
+						borderRadius: 8,
+						padding: 16,
+					},
+        }, [
+
+          this.state.loading
+            ? h('h2', [h('strong', 'Loading... You data will be downloaded in a moment.')])
+            : null,
+          this.state.loading ? null : h('button', {
+            className: 'btn btn-primary m-top-20 center-flex',
             style: {
-              color: 'white',
-              fontWeight: '300',
+              fontSize: 24,
+							display: 'inline-block',
+							marginBottom: 48,
             },
-            className: 'text-white',
-          }, [
-            'Get Goals, Notifications, and Correlations. ',
-            h('strong', '$6/month'),
-          ]),
-        ])
-      ]),
-      h('div', {
-        className: 'col-md-8 center-flex',
-      }, [
-        h('div', {
-          className: 'col-md-12 col-sm-12 col-xs-12 card wow fadeInRight',
-        }, [
-
-          h('div', {
-            className: 'head_title',
-          }, [
-            h('h2', 'Account'),
-            h('button', {
-              className: 'btn btn-primary m-top-20 center-flex',
-              onClick: () => this.pay(),
-            }, 'Pay'),
-            h('div', this.state.error),
-          ]),
+            onClick: () => this.download(),
+          }, 'Download'),
+					h('div', this.state.error),
+					h('h3', {
+						className: 'wow fadeInRight',
+					}, 'Example JSON:'),
+					h('h4', {
+						className: 'wow fadeInRight',
+						style: {
+							fontSize: 16,
+							fontWeight: 'bold',
+							lineHeight: '11px',
+							whiteSpace: 'pre-wrap',
+						},
+					}, `
+	[\n
+		{\n
+			"name": "Health issues",\n
+			"streams": [\n
+				{\n
+					"name": "Heart burn",\n
+					"measure": "true/false",\n
+					"events": [\n
+						{\n
+							"value": 1,\n
+							"date": "2018-12-14T19:03:33.759Z",\n
+						},\n
+						{\n
+							"value": 1,\n
+							"date": "2018-12-13T19:03:00.000Z",\n
+						},\n
+					],\n
+					"graph": "BAR",\n
+				}\n
+			]\n
+		}\n
+	]
+					`),
         ]),
+				h('p', {
+					className: 'wow fadeInRight',
+					style: {
+						color: '#efefef',
+						cursor: 'pointer',
+						opacity: 0.7,
+						paddingTop: 32,
+						paddingBottom: 32,
+					},
+					onClick: () => {
+						Auth.signOut();
+						setTimeout(this.props.logOut, 2000)
+					},
+				}, 'Log out'),
       ]),
     ]);
   }
 }
+
+const removeIds = (obj) => {
+  delete obj.userId;
+  delete obj.id;
+  return obj;
+};

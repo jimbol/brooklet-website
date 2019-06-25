@@ -1340,3 +1340,28 @@ nav.navbar.bootsnav.footer-menu ul li a:hover{
     overflow: hidden;
     max-width: 300px;
 }
+
+[class^="Section__sectionHeader"] {
+    font-size: 32px;
+    color: black;
+}
+
+[class^="Form__formSection"] * {
+    margin-bottom: 12px;
+}
+
+[class^="Form__formSection"] input {
+    margin-bottom: 12px;
+    padding: 12px;
+    border-radius: 8px;
+    border: 1px solid #bcbcbc;
+    width: 100%;
+}
+
+[class^="Form__formSection"] button {
+    margin-bottom: 12px;
+    margin-right: 12px;
+    padding: 12px 24px;
+    border-radius: 8px;
+    border: 1px solid #bcbcbc;
+}

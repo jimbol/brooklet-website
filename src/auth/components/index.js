@@ -2,7 +2,7 @@ import { Component } from 'react';
 import { h } from 'react-hyperscript-helpers';
 import { withAuthenticator } from 'aws-amplify-react';
 
-export const AuthUI = ({ onMount }) => h('div', {
+export const AuthUI = ({ onMount, Comp = () => null }) => h('div', {
   className: 'main_home',
 }, [
   h('div', {
@@ -14,7 +14,7 @@ export const AuthUI = ({ onMount }) => h('div', {
     }, [
       h('h1', {
         className: 'text-white',
-      }, 'Log in'),
+      }, 'Want to download your data?'),
 
       h('h3', {
         style: {
@@ -22,7 +22,7 @@ export const AuthUI = ({ onMount }) => h('div', {
           fontWeight: '300',
         },
         className: 'text-white',
-      }, 'View your cart and update your account.'),
+      }, 'You\'re in the right place! First log in. Then you can download your data.'),
 
     ])
   ]),
