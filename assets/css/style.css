@@ -933,7 +933,7 @@ Home Section style
 }
 .main_home{
     overflow: hidden;
-    padding-top: 200px;
+    padding-top: 120px;
     padding-bottom: 230px;
 }
 .home_text h1{
@@ -1323,7 +1323,7 @@ nav.navbar.bootsnav.footer-menu ul li a:hover{
 }
 
 .card {
-    margin: 18px;
+    margin: 0 auto;
     padding: 18px;
     border-radius: 8px;
     width: 100%;
